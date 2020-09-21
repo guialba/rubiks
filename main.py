@@ -8,7 +8,6 @@ screen = pygame.display.set_mode((800, 600))
 screen.fill((255, 255, 255))
 done = False
 
-
 c = Cube()
 c.draw(screen)
 
