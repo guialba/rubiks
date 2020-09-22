@@ -31,29 +31,31 @@ class Cube:
             (20,200,0), #yellow
             (0,50,255), #blue
             (0,0,0), #black
-            (50,255,50), #green
+            (100,200,50), #green
             (150,230,0), #orange
             (255,20,0) #red
         ]
 
+        #scale
+        self.vertices = self.vertices * (self.size/2)
+        
         ##tilt
-        self.rotate((45, 45, -5))  
+        # self.rotate((45, 45, 0))  
 
     def __calculate_positions(self):  
-        return ((self.__getRotation() * (self.vertices * (self.size/2)).getT()).getT() + self.pos)
+        return (self.vertices + self.pos)
 
     def __orthographic_projection(self):
         scale = np.matrix([
-            [1, 0],
-            [0, 1],
-            [0, 0]
-        ]).getT()
+            [1, 0, 0],
+            [0, 0, 1]
+        ])
 
         offset = np.matrix([[1, 1]]).getT()
 
         points = self.__calculate_positions().getT()
 
-        view = scale  * points + offset
+        view = scale * points + offset
 
         return view.getT().getA()
     
@@ -66,19 +68,15 @@ class Cube:
         meanZ = [list(m)[0][2] for m in mean]    
         
         # print(np.argsort(meanZ)[:-4:-1])
-        return np.argsort(meanZ)[:-4:-1]
+        return np.argsort(meanZ)[:-4]
+
 
     def rotate(self, angle=(0, 30, 0)):
-        self.rotation = self.rotation + np.array(angle)
-        # print(self.rotation)
+        alpha = np.array(angle)[2]
+        beta = np.array(angle)[1]
+        gama = np.array(angle)[0]
 
-
-
-    def __getRotation(self):
-        alpha = self.rotation[0]
-        beta = self.rotation[1]
-        gama = self.rotation[2]
-        return np.matrix([
+        r = np.matrix([
             [
                 round(np.cos(alpha)) * round(np.cos(beta)),
                 round(np.cos(alpha)) * round(np.sin(beta)) * round(np.sin(gama)) -  round(np.sin(alpha)) * round(np.cos(gama)),
@@ -96,6 +94,29 @@ class Cube:
             ]
         ])
 
+        self.vertices = (r * self.vertices.getT()).getT()
+    def rotateAxis(self, angle=15, axis='z'):
+        
+        rotation_matrix = {
+            'x' : np.matrix([
+                [ 1, 0, 0 ],
+                [ 0, round(np.cos(angle)), -round(np.sin(angle)) ],
+                [ 0, round(np.sin(angle)), round(np.cos(angle)) ]
+            ]),
+            'y' : np.matrix([
+                [ round(np.cos(angle)), 0, round(np.sin(angle)) ],
+                [ 0, 1, 0 ],
+                [ -round(np.sin(angle)), 0, round(np.cos(angle)) ]
+            ]),
+            'z' : np.matrix([
+                [ round(np.cos(angle)), -round(np.sin(angle)), 0 ],
+                [ round(np.sin(angle)), round(np.cos(angle)), 0 ],
+                [ 0, 0, 1 ]
+            ])
+        }
+        self.vertices = (rotation_matrix[axis] * self.vertices.getT()).getT()
+
+
 
 
     def draw(self, screen):
@@ -103,11 +124,12 @@ class Cube:
             vertices = self.faces[face]
             points = [list(self.__orthographic_projection()[v]) for v in vertices]
 
+            print(face)
             #print(vertices)
             #print(self.__orthographic_projection())
-            t = np.array([self.pos[0], self.pos[1]])
-            print(np.array(sorted(points, key=lambda point: (point[0], point[1])))-t)
-            pygame.draw.polygon(screen, self.face_colors[face], sorted(points, key=lambda point: (point[0], point[1])))
+            # t = np.array([self.pos[0], self.pos[1]])
+            # print(np.array(points)/self.size/2 - t)
+            pygame.draw.polygon(screen, self.face_colors[face], points)
 
 
 
