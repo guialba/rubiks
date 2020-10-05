@@ -1,6 +1,6 @@
-import pygame
-
 from cube import Cube
+from camera import Camera3D
+import pygame
 
 pygame.init()
 
@@ -8,9 +8,10 @@ screen = pygame.display.set_mode((800, 600))
 screen.fill((255, 255, 255))
 done = False
 
-c = Cube()
-c.draw(screen)
+camera = Camera3D()
+cube = Cube()
 
+camera.render(screen, 'Perspective')
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -20,15 +21,25 @@ while not done:
             pressed = pygame.key.get_pressed()
 
             if pressed[pygame.K_UP]:
-                c.rotateAxis(15, 'y')
+                print('Up')
+                cube.rotate((0,30,0,0))
+
             if pressed[pygame.K_DOWN]:
-                c.rotateAxis(15, 'z')
+                print('Down')
+                cube.rotate((0,0,30,0))
+
             if pressed[pygame.K_RIGHT]:
-                c.rotateAxis(15, 'x')
+                print('Right')
+                cube.rotate((30,0,0,0))
+
             if pressed[pygame.K_LEFT]:
-                print('None')
+                print('Left')
+                cube.rotate((0,0,0,0))
 
-        screen.fill((255, 255, 255))
-        c.draw(screen)
+            screen.fill((255, 255, 255))
+            camera.render(screen, 'Perspective')
 
-    pygame.display.flip()   
+        
+        # screen.fill((255, 255, 255))
+
+     
