@@ -10,6 +10,7 @@ done = False
 
 cube = Ribiks()
 
+
 while not done:
 
     for event in pygame.event.get():

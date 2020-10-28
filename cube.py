@@ -117,7 +117,7 @@ class Cube:
         l1 = np.array(p2[:3]) - np.array(p1[:3])
         l2 = np.array(p3[:3]) - np.array(p1[:3])
         normal = np.cross(l1, l2)
-        l = np.sqrt(normal[0]*normal[0] + normal[1]*normal[1] + normal[2]*normal[0])
+        l = np.sqrt(normal[0]**2 + normal[1]**2 + normal[2]**2)
         
         return normal/l if l>0 else normal
 
@@ -141,18 +141,19 @@ class Cube:
             [0, 0, farPlane / zDiff, 1],
             [0, 0, (farPlane * nearPlane * -1) / zDiff, 0]
         ])
-        trandformed = self.applyTransform()#+np.array([0,0,3,0])
+
+        trandformed = self.applyTransform()
+        trandformed += np.array([0,0,1,0])
 
         projected = trandformed * projectionMatrix
 
         projectedVertices = [
             (
-                (v[0]/(v[3] if v[3] != 0 else 1) + 1) *100,
-                (v[1]/(v[3]  if v[3] != 0 else 1) + 1) *100
+                ((v[0] if v[3] == 0 else v[0]/v[3]) + 1) * 200,
+                ((v[1] if v[3] == 0 else v[1]/v[3]) + 1) * 200
             )
             for v in projected.getA()
         ]
-
         return [
             {
                 "face": face,
